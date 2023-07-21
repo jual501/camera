@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Camera Example</title>
+  <style>
+    #videoElement {
+      width: 400px;
+      height: 300px;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Camera Example</h1>
+  <button onclick="startCamera()">Take Picture</button>
+  <button onclick="savePicture()" id="saveButton" style="display: none;">Save</button>
+  <div>
+    <video id="videoElement" autoplay></video>
+    <canvas id="canvasElement" style="display: none;"></canvas>
+  </div>
+
+  <script>
+    function startCamera() {
+      // Access the user's camera
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          var video = document.getElementById('videoElement');
+          video.srcObject = stream;
+          video.play();
+          document.getElementById('saveButton').style.display = 'block';
+        })
+        .catch(function (error) {
+          console.log("Error accessing the camera: " + error);
+        });
+    }
+
+    function savePicture() {
+      var video = document.getElementById('videoElement');
+      var canvas = document.getElementById('canvasElement');
+
+      // Set the canvas size to match the video stream
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Draw the current video frame onto the canvas
+      var context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert the canvas image to a data URL and download it
+      canvas.toBlob(function (blob) {
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'captured_photo.png';
+        link.click();
+      }, 'image/png');
+    }
+  </script>
+</body>
+</html>
